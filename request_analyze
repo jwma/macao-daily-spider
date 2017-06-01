@@ -1,0 +1,47 @@
+https://h5.newaircloud.com/api/getLayouts?sid=aomen&cid=10038&date=
+https://h5.newaircloud.com/api/getLayouts?sid=aomen&cid=10038&date=2017-05-15
+
+
+var gArticleJson = {
+
+  "fileId":"1636374",
+  "version":"20170516000000",
+  "title":"朝方冀與韓對話",
+  "attAbstract":"",
+  "publishtime":"2017-05-16",
+  "source":"",
+  "author":"",
+  "collaborator":"",
+  "editor":"",
+  "subtitle":"",
+  "introtitle":"",
+  "headtitle":"",
+  "layoutId":"167310",
+  "layout":"A08",
+  "discussClosed":"0",
+  "articleType":"0",
+  "content":"<p>     韓朝官員京短暫交流</p><p></p><p>    朝方冀與韓對話</p><p></p><p>    【香港中通社十五日電】據韓聯社報道，中國“一帶一路”國際合作高峰論壇十四日在北京國家會議中心開幕，韓朝各派代表團出席，雙方團長見面並作短暫交流。</p><p></p><p>    由於十四日清晨朝鮮試射導彈，雙方代表團並無專門安排會面，但韓方代表團團長、共同民主黨議員朴炳錫與朝方團長、對外經濟相金英才在論壇開幕前半小時左右在會場休息室有短暫交流。據悉，當時並無其他代表團在場。</p><p>    韓責朝再射導彈</p><p>    朴炳錫並未公開具體談話內容，但說已向朝方團長就朝鮮當天射彈表示強烈譴責，並指出朝方似對韓朝對話抱有期待。路透社也引述韓國代表團中的一名官員說，他們感覺到朝鮮對於與韓國新政府展開對話“有所期待”。</p><p>    十二日在接受韓聯社記者採訪時，朴炳錫曾表示有計劃在論壇上與金英才會晤，抵達北京機場後也向採訪記者團表示，有可能與朝方接觸。</p><p>    韓聯社引述外交消息人士分析，由於朝鮮試射導彈，導致韓朝代表團不宜深入交流，但因雙方參加的論壇日程相仿，可能還會有短暫見面機會。</p><p>    另外，出席論壇的日本代表團團長、自民黨幹事長二階俊博表示，朝鮮選擇在論壇開幕日試射導彈，行為絕對不能容忍。</p><p> </p>",
+  "images":[
+    {
+      "type":"0",
+      "summary":"    朝方團長、對外經濟相金英才出席完“一 帶一路”論壇後坐巴士離開。（路透社） ",
+      "imageUrl":"http://img.newaircloud.com/aomen/paper/201705/16/6f06dde5-56da-40af-b787-909417094ab7.jpg"
+    },
+    {
+      "type":"0",
+      "summary":"    朝鮮宣佈成功試射中遠程導彈後，朝鮮最高領導人金正恩和士兵表現興奮。（路透社）",
+      "imageUrl":"http://img.newaircloud.com/aomen/paper/201705/16/bfb8d9d0-e9a1-4adb-a412-d6ed0e5d0e7f.jpg"
+    },
+    {
+      "type":"0",
+      "summary":"    朝中社發佈試射“火星12”型地對地中遠程“火箭”的照片（路透社）",
+      "imageUrl":"http://img.newaircloud.com/aomen/paper/201705/16/a701df79-3c1a-4570-a121-69e3140b6855.jpg"
+    },
+    {
+      "type":"0",
+      "summary":"    金正恩在觀看“火星12”型地對地中遠程“火箭”　　　　　　　　　　  （路透社）",
+      "imageUrl":"http://img.newaircloud.com/aomen/paper/201705/16/3149cb3d-97e2-4c75-9524-066d38eb0065.jpg"
+    },
+  ]
+
+}
