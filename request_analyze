@@ -1,7 +1,9 @@
+获取最新的版面信息
 https://h5.newaircloud.com/api/getLayouts?sid=aomen&cid=10038&date=
+根据日期获取版面信息
 https://h5.newaircloud.com/api/getLayouts?sid=aomen&cid=10038&date=2017-05-15
 
-
+某篇新闻的 json 对象
 var gArticleJson = {
 
   "fileId":"1636374",
