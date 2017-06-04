@@ -2,3 +2,5 @@
 .idea/
 
 venv/
+/tmp_data/*
+!tmp_data/.gitkeep
