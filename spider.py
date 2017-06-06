@@ -51,8 +51,15 @@ def crawl_news_url():
             print(news_data_url)
 
             with connection.cursor() as cursor:
-                sql = 'INSERT INTO `task` (`url`, `extra_data`) VALUES (%s, %s)'
-                cursor.execute(sql, (news_data_url, json.dumps({'layoutName': layout_name})))
+                check_sql = 'SELECT COUNT(id) AS `n` FROM `task` WHERE `url` = %s'
+                cursor.execute(check_sql, (news_data_url,))
+                check_result = cursor.fetchone()
+                if check_result.get('n') > 0:
+                    print('已存在，跳过')
+                    continue
+
+                insert_sql = 'INSERT INTO `task` (`url`, `extra_data`) VALUES (%s, %s)'
+                cursor.execute(insert_sql, (news_data_url, json.dumps({'layoutName': layout_name})), )
 
                 # news_data_response = urlopen(news_data_url)
                 # news_data_str = news_data_response.read().decode('utf8')
