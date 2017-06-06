@@ -2,4 +2,6 @@
 
 一个爬取澳门日报信息的爬虫。
 
-运行`python ./spider.py news_url|news_data`，目前数据暂时没有保存到本地或者数据库。
+运行 `python spider.py news_url` 更新最新的新闻任务。
+
+运行 `python spider.py news_data` 开始对新闻任务进行解析并保存（未实现）。
