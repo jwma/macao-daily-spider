@@ -1,9 +1,9 @@
 # coding=utf-8
-from urllib.request import urlopen, urlretrieve
-import time
+from urllib.request import urlopen
 import json
 import sys
 import os
+import pymysql.cursors
 
 url = 'https://h5.newaircloud.com/api/getLayouts?sid=aomen&cid=10038&date='
 full_list_response = urlopen(url)
@@ -21,6 +21,13 @@ if layouts is None:
     print('返回的数据没有版面数据，请手动检查接口数据是否正确')
     sys.exit()
 
+connection = pymysql.connect(host='localhost',
+                             user='root',
+                             password='root',
+                             db='macao_daily',
+                             charset='utf8mb4',
+                             cursorclass=pymysql.cursors.DictCursor)
+
 for layout in layouts:
     layout_name = layout.get('name')
 
@@ -37,17 +44,25 @@ for layout in layouts:
         continue
 
     for news in news_list:
-        news_id = news.get('id')
-        news_title = news.get('title')
-        news_pic = news.get('pic1')
         news_data_url = news.get('curl')
 
         print('当前：%s | %s' % (layout_name, layout_date))
         print(news_data_url)
 
-        urlretrieve(news_data_url, '%s/%s.js' % (new_tmp_data_path, news_id))
-        time.sleep(0.1)
+        with connection.cursor() as cursor:
+            sql = 'INSERT INTO `task` (`url`, `extra_data`) VALUES (%s, %s)'
+            cursor.execute(sql, (news_data_url, json.dumps({'layoutName': layout_name})))
 
-    time.sleep(0.3)
+            # news_data_response = urlopen(news_data_url)
+            # news_data_str = news_data_response.read().decode('utf8')
+            # news_data_response.close()
 
+            # urlretrieve(news_data_url, '%s/%s.js' % (new_tmp_data_path, news_id))
+            # news_data = eval(news_data_str.strip('var gArticleJson = '),
+            # type('Dummy', (dict,), dict(__getitem__=lambda s, n: n))())
+            # news_data['layout_name'] = layout_name
+
+    connection.commit()
+
+connection.close()
 print('数据抓取完成')
