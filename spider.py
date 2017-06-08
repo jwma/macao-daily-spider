@@ -4,6 +4,8 @@ import json
 import sys
 import os
 import pymysql.cursors
+import threading
+import time
 
 
 def crawl_news_url():
@@ -11,11 +13,6 @@ def crawl_news_url():
     full_list_response = urlopen(url)
     list_data = json.loads(full_list_response.read().decode('utf8'))
     full_list_response.close()
-
-    date = list_data.get('date')
-    new_tmp_data_path = './tmp_data/%s' % date
-    if not os.path.exists(new_tmp_data_path):
-        os.mkdir(new_tmp_data_path)
 
     layouts = list_data.get('layouts')
 
@@ -76,6 +73,56 @@ def crawl_news_url():
     print('数据抓取完成')
 
 
+class TaskWorker(threading.Thread):
+    def __init__(self, id, tasks, connection):
+        super().__init__()
+
+        self.id = id
+        self.tasks = tasks
+        self.connection = connection
+
+    def run(self):
+        update_task_status_sql = 'UPDATE `task` SET `status` = 1 WHERE `url` = %s'
+        for task in self.tasks:
+            news_data_response = urlopen(task['url'])
+            news_data = news_data_response.read().decode('utf8')
+            print('%s 处理 %s' % (self.id, task['url']))
+            with self.connection.cursor() as cursor:
+                cursor.execute(update_task_status_sql, (task['url'],))
+
+            time.sleep(0.1)
+
+        self.connection.commit()
+        print('%s 处理完毕' % self.id)
+
+
+def crawl_news_data():
+    connection = pymysql.connect(host='localhost',
+                                 user='root',
+                                 password='root',
+                                 db='macao_daily',
+                                 charset='utf8mb4',
+                                 cursorclass=pymysql.cursors.DictCursor)
+
+    list_task_sql = 'SELECT `url`, `extra_data` FROM `task` WHERE `status` = 0'
+    with connection.cursor() as cursor:
+        cursor.execute(list_task_sql)
+        task_list = cursor.fetchall()
+
+        workers = []
+        for i in range(0, len(task_list), 50):
+            tasks = task_list[i:i + 50]
+            task_worker = TaskWorker(i + 1, tasks, connection)
+            task_worker.start()
+            workers.append(task_worker)
+
+        for worker in workers:
+            worker.join()
+
+        connection.close()
+        print('全部处理完毕')
+
+
 if __name__ == '__main__':
     actions = ['news_url', 'news_data']
 
@@ -87,6 +134,6 @@ if __name__ == '__main__':
     if action == 'news_url':
         crawl_news_url()
     elif action == 'news_data':
-        print('待实现')
+        crawl_news_data()
     else:
         print('不存在的操作，python spider.py %s' % '|'.join(actions))
