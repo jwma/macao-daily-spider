@@ -63,15 +63,6 @@ def crawl_news_url():
                 insert_sql = 'INSERT INTO `task` (`url`, `extra_data`) VALUES (%s, %s)'
                 cursor.execute(insert_sql, (news_data_url, json.dumps({'layoutName': layout_name})), )
 
-                # news_data_response = urlopen(news_data_url)
-                # news_data_str = news_data_response.read().decode('utf8')
-                # news_data_response.close()
-
-                # urlretrieve(news_data_url, '%s/%s.js' % (new_tmp_data_path, news_id))
-                # news_data = eval(news_data_str.strip('var gArticleJson = '),
-                # type('Dummy', (dict,), dict(__getitem__=lambda s, n: n))())
-                # news_data['layout_name'] = layout_name
-
         connection.commit()
 
     connection.close()
