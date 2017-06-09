@@ -4,4 +4,4 @@
 
 运行 `python spider.py news_url` 更新最新的新闻任务。
 
-运行 `python spider.py news_data` 开始对新闻任务进行解析并保存（未实现）。
+运行 `python spider.py news_data` 开始对新闻任务进行解析并保存。
