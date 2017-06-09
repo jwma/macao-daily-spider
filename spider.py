@@ -8,6 +8,16 @@ import threading
 import time
 
 
+def get_connection():
+    connection = pymysql.connect(host='localhost',
+                                 user='root',
+                                 password='root',
+                                 db='macao_daily',
+                                 charset='utf8mb4',
+                                 cursorclass=pymysql.cursors.DictCursor)
+    return connection
+
+
 def crawl_news_url():
     url = 'https://h5.newaircloud.com/api/getLayouts?sid=aomen&cid=10038&date='
     full_list_response = urlopen(url)
@@ -20,12 +30,7 @@ def crawl_news_url():
         print('返回的数据没有版面数据，请手动检查接口数据是否正确')
         sys.exit()
 
-    connection = pymysql.connect(host='localhost',
-                                 user='root',
-                                 password='root',
-                                 db='macao_daily',
-                                 charset='utf8mb4',
-                                 cursorclass=pymysql.cursors.DictCursor)
+    connection = get_connection()
 
     for layout in layouts:
         layout_name = layout.get('name')
@@ -74,52 +79,64 @@ def crawl_news_url():
 
 
 class TaskWorker(threading.Thread):
-    def __init__(self, id, tasks, connection):
+    def __init__(self, id, tasks):
         super().__init__()
 
         self.id = id
         self.tasks = tasks
-        self.connection = connection
+        self.connection = get_connection()
 
     def run(self):
         update_task_status_sql = 'UPDATE `task` SET `status` = 1 WHERE `url` = %s'
+        insert_news_sql = 'INSERT INTO `news` (`title`, `publishtime`, `content`, `layout`, `layout_name`, `images`)' \
+                          ' VALUES (%s, %s, %s, %s, %s, %s)'
+
         for task in self.tasks:
             news_data_response = urlopen(task['url'])
-            news_data = news_data_response.read().decode('utf8')
-            print('%s 处理 %s' % (self.id, task['url']))
+            news_data = eval(news_data_response.read().decode('utf8').strip('var gArticleJson = '),
+                             type('Dummy', (dict,), dict(__getitem__=lambda s, n: n))())
+            news_data_response.close()
+
+            title = news_data.get('title')
+            publishtime = news_data.get('publishtime')
+            content = news_data.get('content')
+            layout = news_data.get('layout')
+            images = json.dumps(news_data.get('images'))
+
+            news_extra_data = json.loads(task['extra_data'])
+            layout_name = news_extra_data.get('layoutName')
+
+            print('%s - %s' % (self.id, task['url']))
             with self.connection.cursor() as cursor:
                 cursor.execute(update_task_status_sql, (task['url'],))
+                cursor.execute(insert_news_sql, (title, publishtime, content, layout, layout_name, images,))
 
-            time.sleep(0.1)
+            time.sleep(0.05)
 
         self.connection.commit()
+        self.connection.close()
         print('%s 处理完毕' % self.id)
 
 
 def crawl_news_data():
-    connection = pymysql.connect(host='localhost',
-                                 user='root',
-                                 password='root',
-                                 db='macao_daily',
-                                 charset='utf8mb4',
-                                 cursorclass=pymysql.cursors.DictCursor)
-
+    connection = get_connection()
     list_task_sql = 'SELECT `url`, `extra_data` FROM `task` WHERE `status` = 0'
     with connection.cursor() as cursor:
         cursor.execute(list_task_sql)
         task_list = cursor.fetchall()
+        cursor.close()
+        connection.close()
 
         workers = []
         for i in range(0, len(task_list), 50):
             tasks = task_list[i:i + 50]
-            task_worker = TaskWorker(i + 1, tasks, connection)
+            task_worker = TaskWorker(i + 1, tasks)
             task_worker.start()
             workers.append(task_worker)
 
         for worker in workers:
             worker.join()
 
-        connection.close()
         print('全部处理完毕')
 
 
