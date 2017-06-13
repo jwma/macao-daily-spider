@@ -2,7 +2,6 @@
 from urllib.request import urlopen
 import json
 import sys
-import os
 import pymysql.cursors
 import threading
 import time
