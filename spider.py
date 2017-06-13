@@ -1,10 +1,11 @@
 # coding=utf-8
-from urllib.request import urlopen
+from urllib.request import urlopen, urlretrieve
 import json
 import sys
 import pymysql.cursors
 import threading
 import time
+import os
 
 
 def get_connection():
@@ -91,7 +92,17 @@ class TaskWorker(threading.Thread):
             publishtime = news_data.get('publishtime')
             content = news_data.get('content')
             layout = news_data.get('layout')
-            images = json.dumps(news_data.get('images'))
+            # images = json.dumps(news_data.get('images'))
+            origin_images = news_data.get('images')
+            images = []
+
+            if len(origin_images) > 0:
+                for i in range(len(origin_images)):
+                    image = origin_images[i]
+                    save_path = 'images/%s' % os.path.basename(image.get('imageUrl'))
+                    urlretrieve(image.get('imageUrl'), save_path)
+                    images.append({'summary': image.get('summary'), 'url': save_path})
+                    time.sleep(0.01)
 
             news_extra_data = json.loads(task['extra_data'])
             layout_name = news_extra_data.get('layoutName')
@@ -99,11 +110,11 @@ class TaskWorker(threading.Thread):
             print('%s - %s' % (self.id, task['url']))
             with self.connection.cursor() as cursor:
                 cursor.execute(update_task_status_sql, (task['url'],))
-                cursor.execute(insert_news_sql, (title, publishtime, content, layout, layout_name, images,))
+                cursor.execute(insert_news_sql, (title, publishtime, content, layout, layout_name, json.dumps(images),))
 
+            self.connection.commit()
             time.sleep(0.05)
 
-        self.connection.commit()
         self.connection.close()
         print('%s 处理完毕' % self.id)
 
